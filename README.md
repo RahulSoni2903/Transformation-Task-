@@ -221,4 +221,49 @@ FROM dbo.Final_Dataverse;
 
 This step prepares the **`final_name`** table, which is later used as the input source for applying **Fuzzy Grouping** on customer names.
 
+## 🔎 Customer Name Standardization – Fuzzy Grouping Data Flow
+
+<img width="212" height="345" alt="Screenshot (910)" src="https://github.com/user-attachments/assets/fe50fb2f-2d61-47dd-b989-f38bafd07e7a" />
+
+This is the next Data Flow Task executed after the **Execute SQL Task**.
+This data flow is used to perform **Fuzzy Grouping**, which helps to generate accurate and standardized customer names in the system.
+
+---
+
+### 🔹 Fuzzy Grouping Configuration
+
+<img width="680" height="726" alt="Screenshot (912)" src="https://github.com/user-attachments/assets/e300a799-3468-47d7-b383-002a9c0c402e" />
+
+Open the **Fuzzy Grouping** transformation and select the column on which Fuzzy Grouping needs to be applied.
+
+In this project, Fuzzy Grouping is applied on the **CustomerName** column.
+
+The alias output column name is set as **`Correct_Name`**.
+
+---
+
+### 🔹 Advanced Configuration
+
+<img width="680" height="715" alt="Screenshot (911)" src="https://github.com/user-attachments/assets/147e8474-c7e2-40c5-a612-19aba2ba9180" />
+
+In the next tab of the Fuzzy Grouping editor, the configuration is set as shown above.
+
+This configuration controls the similarity matching behavior and grouping logic.
+
+---
+
+### 🔹 Load Standardized Output
+
+<img width="618" height="513" alt="Screenshot (913)" src="https://github.com/user-attachments/assets/a7a3ec6c-c2f8-49af-b1ed-db09c8b4b804" />
+
+After applying Fuzzy Grouping, the cleaned and standardized output is stored in the database table named **`Correct_Name`**.
+
+This output contains:
+
+* the standardized customer name (**Correct_Name**),
+* the original customer name,
+* the similarity score, and
+* grouping information.
+
+This final output represents the clean customer name dataset, which is used in the next stages of the data quality and reporting pipeline.
 
