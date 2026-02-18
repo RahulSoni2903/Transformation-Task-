@@ -1,0 +1,69 @@
+Retail Sales Integration & Data Quality Pipeline
+A retail company receives daily sales files from multiple regional systems.
+
+But the data has problems:
+
+- data comes from multiple CSV files
+
+- customer names are not consistent
+
+- product codes need to be validated
+
+- some records are invalid
+
+- business wants:
+
+	-- clean data
+
+	-- enriched data
+
+	-- aggregated data
+
+	-- audit info
+
+	-- and final loading
+
+You must build an SSIS pipeline to prepare data for reporting.
+
+
+Dev - Create:
+Dim_Customer_master_table/ Customer_master_table
+CustomerId
+CustomerName
+City
+
+
+Dim_Product_master_table/ Product_master_table
+ProductCode
+ProductId
+Category
+
+Use:
+Union All    
+Derived Column
+Data Conversion
+Character Map
+Lookup
+Cache Transform
+Fuzzy Lookup
+Conditional Split
+Multicast
+Aggregate
+Row Count
+Sort
+OLE DB Command
+Merge / Merge Join (optional) 
+
+
+outputs:
+- Fact_Sales_Clean
+- Sales_Rejected(
+If any record:
+ProductId IS NULL
+OR
+CustomerId IS NULL
+OR
+Similarity < 0.80
+)
+- Sales_Daily_Summary(agg table)
+

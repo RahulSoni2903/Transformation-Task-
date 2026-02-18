@@ -1,0 +1,1 @@
+int rank;public override void PreExecute(){    **base.PreExecute();**    \*\*rank = 0;\*\*}public override void Input0_ProcessInputRow(Input0Buffer Row){    **rank++;**    \*\*Row.RankNo = rank;\*\*}
