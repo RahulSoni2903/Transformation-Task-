@@ -110,3 +110,61 @@ The main objective of this project is to build a **professional and reliable ETL
     * ProductId
     * Category
 
+## ✅ Solutions – 1st Workflow
+
+<img width="386" height="659" alt="Screenshot (905)" src="https://github.com/user-attachments/assets/dfee5d12-2673-4e72-a64c-befd55baec40" />
+
+This is the complete workflow of this project.
+
+---
+
+### 🔹 Step 1 – Initial Data Load and Append
+
+For ease of processing, first of all, the complete source data is stored in the database.
+Since all source CSV files have the **same schema**, all files are **appended into a single table**.
+
+The first step of the solution is to retrieve all source files from the server using a **Foreach Loop Container**.
+
+---
+
+## 🔧 Foreach Loop Container – Configuration
+
+<img width="738" height="700" alt="Foreach Configration" src="https://github.com/user-attachments/assets/42646e19-8612-423f-be5f-dda204f8feac" />
+
+1. Go to the **Collection** tab and set the **Enumerator** to **Foreach File Enumerator**.
+   *(The enumerator decides how files are iterated during execution. Foreach File Enumerator processes files one by one.)*
+
+2. Provide the **folder path** where the source files are located.
+   If the files are stored in multiple folders, provide only the **root folder path**.
+
+3. Enable the **Traverse subfolders** option.
+
+4. Go to the **Variable Mappings** tab and assign a variable with **Index = 0**.
+
+This completes the configuration of the **Foreach Loop Container**.
+
+---
+
+## 🔁 Data Flow Task – *Load at SSMS*
+
+<img width="327" height="318" alt="Screenshot (907)" src="https://github.com/user-attachments/assets/4d0aba38-76aa-4aee-a3c6-772a4aa2fb63" />
+
+This is the main Data Flow Task named **“Load at SSMS”**.
+
+Inside this Data Flow Task:
+
+1. **Flat File Source** is used to read the CSV file.
+2. **OLE DB Destination** is used to store and append the CSV data into the SQL Server table.
+
+The main configuration is used to provide a **dynamic file path** so that the package can automatically switch from one file to another during execution.
+
+To configure the dynamic path:
+
+* Open the **Flat File Connection Manager**.
+* Press **F4**.
+* Go to **Expressions**.
+* Set the expression on **ConnectionString**.
+* Assign the file path variable.
+
+After this configuration, the data from all CSV files is loaded and appended successfully into the **SSMS server**.
+
