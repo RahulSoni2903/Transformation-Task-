@@ -168,3 +168,54 @@ To configure the dynamic path:
 
 After this configuration, the data from all CSV files is loaded and appended successfully into the **SSMS server**.
 
+<img width="438" height="502" alt="Screenshot (908)" src="https://github.com/user-attachments/assets/d6740e5f-cf9c-436e-a59b-a2309077a6a6" />
+All 24 Records Are Store In DataBase Successfully  Table name is FinalDataverse
+
+## 🔎 Customer Name Standardization using Fuzzy Grouping
+
+Now, in the final table, some customer names are **not exactly the same** and contain **small differences**.
+To generate accurate and consistent customer names, **Fuzzy Grouping** is applied.
+
+**Fuzzy Grouping** is a technique that matches similar names with each other based on textual similarity.
+
+---
+
+### 🔹 Preparation for Fuzzy Grouping
+
+Before applying Fuzzy Grouping, only the required columns are extracted.
+
+From the final database table, the following two columns are selected:
+
+* `OrderId`
+* `CustomerName`
+
+These two columns are stored in a separate table named **`final_name`**.
+
+This is done using an **Execute Process Task** in the workflow.
+
+---
+
+<img width="735" height="697" alt="Screenshot (909)" src="https://github.com/user-attachments/assets/72c8728d-0a6b-460c-befd-4ba4028dd030" />
+
+---
+
+### 🔹 Execute Process Task – Configuration
+
+The following command is executed on the database through the Execute Process Task:
+
+```sql
+IF OBJECT_ID('dbo.final_name','U') IS NOT NULL
+BEGIN
+    DROP TABLE dbo.final_name;
+END;
+
+SELECT 
+    OrderId,
+    Customername
+INTO dbo.final_name
+FROM dbo.Final_Dataverse;
+```
+
+This step prepares the `final_name` table, which is later used as the input source for applying **Fuzzy Grouping** on customer names.
+
+
