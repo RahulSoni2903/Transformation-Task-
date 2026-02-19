@@ -492,7 +492,217 @@ ProductCode == "P1004" ? "Home Appliances" :
 "Unknown"
 ```
 
+---## 🧾 Final Data Flow – Fact & Aggregation Layer
+
+<img width="1183" height="676" alt="Screenshot (922)" src="https://github.com/user-attachments/assets/42ed8351-fc28-477c-8ccf-7b327d110ba6" />
+
+After completing the **Clean Data** and **dimension load** steps, this final data flow builds the analytical layer of the warehouse and produces the following outputs:
+
+### ✅ Final Outputs
+
+* **Fact_Sales_Clean**
+* **Sales_Reject**
+* **Sales_Daily_Summary** (aggregation table)
+
 ---
 
+## 🎯 Business Rules for Record Validation
 
+A record is considered **rejected** if **any** of the following conditions is true:
 
+* `ProductId` **IS NULL**
+* `CustomerId` **IS NULL**
+* `_Similarity_Customername < 0.80`
+
+All remaining records are considered valid and are loaded into the fact table.
+
+---
+
+## 🔗 Data Enrichment Using Merge Join
+
+To evaluate the above conditions, the following data is required:
+
+* **CustomerID** → from `Dim_Customer_Master`
+* **ProductID** → from `Dim_Product_Master`
+* **Similarity score** → from the Clean Data output
+
+<img width="921" height="300" alt="Screenshot (924)" src="https://github.com/user-attachments/assets/3fda7a58-153e-49ba-a60b-ba7c0da21f08" />
+
+Because the lookup data is coming from multiple tables, **Merge Join** transformations are used.
+
+> ⚠️ In SSIS, inputs to a Merge Join must be sorted.
+> Therefore, **Sort transformations** are applied before every merge.
+
+---
+
+### 🔹 Step 1 – Merge with Product Dimension
+
+* Clean data is sorted by **ProductCode**
+* `Dim_Product_Master` is sorted by **ProductCode**
+* Both datasets are merged using **ProductCode** as the common key
+
+This produces an intermediate dataset enriched with **ProductId**.
+
+---
+
+### 🔹 Step 2 – Merge with Customer Dimension
+
+<img width="422" height="375" alt="Screenshot (925)" src="https://github.com/user-attachments/assets/a0970f23-d889-40ed-9a07-7173d753199b" />
+
+* The previous output is sorted by **Customer_Name**
+* `Dim_Customer_Master` is sorted by **Customer_Name**
+* Both datasets are merged using **Customer_Name** as the common key
+
+This produces a fully enriched dataset containing:
+
+* ProductId
+* CustomerId
+* Similarity score
+
+---
+
+## 🔀 Conditional Split – Accepted vs Rejected Records
+
+<img width="715" height="718" alt="Screenshot (926)" src="https://github.com/user-attachments/assets/ac1c3061-947d-4cae-9804-d68e092ee1c3" />
+
+A **Conditional Split** transformation is applied to separate valid and invalid records.
+
+### ✔ Selected (Valid records)
+
+Condition:
+
+```
+_Similarity_Customername > 0.80
+```
+
+### ❌ Rejected (Invalid records)
+
+Condition:
+
+```
+ISNULL(ProductID) 
+|| ISNULL(Customer_id) 
+|| _Similarity_Customername < 0.80
+```
+
+---
+
+## 🧮 Aggregation on Selected Records
+
+In this dataset, the same customer (for example, *Jon Smith*) can place orders from multiple regions (East and West).
+This causes duplicate logical entities when loading the fact table.
+
+To handle this, an **Aggregate** transformation is applied on the selected branch using appropriate **GROUP BY** keys.
+
+---
+
+## 📦 Fact Table Load
+
+<img width="520" height="515" alt="Screenshot (927)" src="https://github.com/user-attachments/assets/592ce4ca-177b-4cb1-9563-97f199ae99eb" />
+
+All validated and aggregated records are stored in:
+
+```
+Fact_Sales_Clean
+```
+
+**Result:**
+✔ 23 records loaded into the fact table.
+
+---
+
+## 🚫 Rejected Records Load
+
+<img width="598" height="103" alt="Screenshot (928)" src="https://github.com/user-attachments/assets/2c27af1a-db68-4b51-9a5f-97ee1cdebe60" />
+
+All records failing the validation rules are stored in:
+
+```
+Sales_Reject
+```
+
+**Result:**
+❌ 1 record rejected.
+
+---
+
+## 📊 Sales Daily Summary – Aggregation Layer
+
+After loading the fact table, the selected stream is reused (via Multicast) to build the sales summary dataset.
+
+<img width="860" height="428" alt="Screenshot (929)" src="https://github.com/user-attachments/assets/84e9fb82-e39e-4a47-b6c8-43d7bc62794e" />
+
+The source for this step is:
+
+```
+Fact_Sales_Clean
+```
+
+---
+
+### 🔹 1. Regional Sales Metrics
+
+<img width="534" height="117" alt="Screenshot (930)" src="https://github.com/user-attachments/assets/9133f8e4-3b40-41b1-827f-a3ae2db543e2" />
+
+The following measures are calculated **per region**:
+
+* Total_Sale
+* Avg_Sale
+* Max_Sale
+* Min_Sale
+
+---
+
+### 🔹 2. Ranking by Total Sales per Region
+
+<img width="206" height="122" alt="Screenshot (931)" src="https://github.com/user-attachments/assets/6320008f-28f7-4bf2-a9f2-d98999a21cb1" />
+
+A ranking is generated based on **total sales within each region**.
+
+---
+
+### 🔹 3. Total Orders per Date
+
+<img width="357" height="127" alt="Screenshot (932)" src="https://github.com/user-attachments/assets/1085bda9-127d-44ef-ac91-09e0bd1b0d91" />
+
+The total number of orders is calculated for each **OrderDate**.
+
+---
+
+### 🔹 4. Rollup-style Aggregation (Region, OrderDate)
+
+<img width="309" height="235" alt="Screenshot (934)" src="https://github.com/user-attachments/assets/498df676-331a-4961-a94b-5b9391e24d2d" />
+
+A rollup-style aggregation is implemented on:
+
+```
+(Region, OrderDate)
+```
+
+This produces hierarchical summaries similar to the SQL `ROLLUP` operator.
+
+---
+
+## 🗄️ Final Summary Table
+
+All aggregation outputs are stored in:
+
+```
+Sales_Daily_Summary
+```
+
+---
+
+## ✅ Final Result
+
+This final data flow completes the ETL pipeline by:
+
+* enriching clean data with product and customer surrogate keys
+* validating records using business rules and similarity thresholds
+* isolating rejected records for audit and quality checks
+* building a clean, deduplicated fact table
+* generating multiple analytical aggregations for reporting
+
+This completes the end-to-end **clean, validate, enrich and aggregate** workflow of the project.
+
+   
