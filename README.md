@@ -267,3 +267,80 @@ This output contains:
 
 This final output represents the clean customer name dataset, which is used in the next stages of the data quality and reporting pipeline.
 
+Below is a clean and professional **GitHub README** section for your next workflow step.
+
+---
+
+## 🧹 Clean Data – Build Dimension Master Tables
+
+After completing the **Fuzzy Grouping** step, the next workflow is **Clean Data**.
+This step prepares high-quality, standardized records and generates two dimension tables:
+
+* **Dim_Customer_Master**
+* **Dim_Product_Master**
+
+The goal is to use the corrected (fuzzed) customer names and merge them with the main transactional data.
+
+---
+
+## 🔹 Data Flow – Clean Data
+
+In this Data Flow, an **OLE DB Source** is used to read cleaned and corrected records.
+
+We join:
+
+* `Final_Dataverse` → main transactional data
+* `Correct_Name` → output of the fuzzy matching step
+
+This ensures that only the **correct and standardized customer names** are used while building the dimension tables.
+
+---
+
+## 🔹 OLE DB Source Configuration
+
+**Access Mode**
+
+```
+SQL command
+```
+
+**Query used**
+
+```sql
+SELECT DISTINCT
+       o.OrderId,
+       o.OrderDate,
+       c.Correct_Name,
+       o.ProductCode,
+       o.Quantity,
+       o.Amount,
+       c._Similarity_Customername
+FROM Final_Dataverse o
+JOIN Correct_Name c
+     ON o.OrderId = c.OrderId
+ORDER BY o.OrderDate;
+```
+
+---
+
+## 🔹 Why SQL Command is Used
+
+Using a SQL command inside the OLE DB Source:
+
+* performs the **JOIN at the database level**
+* reduces unnecessary data movement inside SSIS
+* improves **performance and execution speed**
+* provides a more **optimized and scalable** data flow
+
+---
+
+## 🔹 Output Usage
+
+The cleaned and joined result set is further used to populate:
+
+* **Dim_Customer_Master** – contains standardized customer information
+* **Dim_Product_Master** – contains cleaned and unique product details
+
+This step guarantees that both dimension tables are built only from **validated and corrected data** produced by the fuzzy matching process.
+
+
