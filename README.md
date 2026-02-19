@@ -560,7 +560,9 @@ This produces a fully enriched dataset containing:
 ## 🔀 Conditional Split – Accepted vs Rejected Records
 
 <img width="422" height="375" alt="Screenshot (925)" src="https://github.com/user-attachments/assets/a0970f23-d889-40ed-9a07-7173d753199b" />
-A **Conditional Split** transformation is applied to separate valid and invalid records.
+
+   
+   **Conditional Split** transformation is applied to separate valid and invalid records.
 
 ### ✔ Selected (Valid records)
 
