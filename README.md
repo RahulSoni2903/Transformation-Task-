@@ -545,9 +545,6 @@ This produces an intermediate dataset enriched with **ProductId**.
 ---
 
 ### 🔹 Step 2 – Merge with Customer Dimension
-
-<img width="422" height="375" alt="Screenshot (925)" src="https://github.com/user-attachments/assets/a0970f23-d889-40ed-9a07-7173d753199b" />
-
 * The previous output is sorted by **Customer_Name**
 * `Dim_Customer_Master` is sorted by **Customer_Name**
 * Both datasets are merged using **Customer_Name** as the common key
@@ -562,8 +559,7 @@ This produces a fully enriched dataset containing:
 
 ## 🔀 Conditional Split – Accepted vs Rejected Records
 
-<img width="715" height="718" alt="Screenshot (926)" src="https://github.com/user-attachments/assets/ac1c3061-947d-4cae-9804-d68e092ee1c3" />
-
+<img width="422" height="375" alt="Screenshot (925)" src="https://github.com/user-attachments/assets/a0970f23-d889-40ed-9a07-7173d753199b" />
 A **Conditional Split** transformation is applied to separate valid and invalid records.
 
 ### ✔ Selected (Valid records)
@@ -587,6 +583,7 @@ ISNULL(ProductID)
 ---
 
 ## 🧮 Aggregation on Selected Records
+<img width="715" height="718" alt="Screenshot (926)" src="https://github.com/user-attachments/assets/ac1c3061-947d-4cae-9804-d68e092ee1c3" />
 
 In this dataset, the same customer (for example, *Jon Smith*) can place orders from multiple regions (East and West).
 This causes duplicate logical entities when loading the fact table.
