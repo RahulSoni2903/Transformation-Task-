@@ -169,8 +169,7 @@ To configure the dynamic path:
 After this configuration, the data from all CSV files is loaded and appended successfully into the **SSMS server**.
 
 <img width="438" height="502" alt="Screenshot (908)" src="https://github.com/user-attachments/assets/d6740e5f-cf9c-436e-a59b-a2309077a6a6" />
-All **24 records** are stored successfully in the database.
-The final table name is **`Final_Dataverse`**.
+
 
 ---
 
