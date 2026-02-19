@@ -494,14 +494,5 @@ ProductCode == "P1004" ? "Home Appliances" :
 
 ---
 
-### 🔹 Destination Table
-
-The final cleaned and enriched product data is loaded into the table:
-
-```
-Dim_Product_Master
-```
-
-This step completes the product dimension creation by generating a surrogate key and enriching each product with a business-friendly category, using only standardized and validated data produced by the Clean Data workflow.
 
 
