@@ -267,44 +267,50 @@ This output contains:
 
 This final output represents the clean customer name dataset, which is used in the next stages of the data quality and reporting pipeline.
 
-Below is a clean and professional **GitHub README** section for your next workflow step.
-
----
-
 ## 🧹 Clean Data – Build Dimension Master Tables
 
-After completing the **Fuzzy Grouping** step, the next workflow is **Clean Data**.
-This step prepares high-quality, standardized records and generates two dimension tables:
+<img width="1010" height="650" alt="Screenshot (915)" src="https://github.com/user-attachments/assets/8baba8a9-6470-47dc-a926-abe0c29d0624" />
+
+After completing the **Fuzzy Grouping** step, the next workflow step is **Clean Data**.
+In this step, the cleaned and corrected customer names are used to generate the following dimension tables:
 
 * **Dim_Customer_Master**
 * **Dim_Product_Master**
 
-The goal is to use the corrected (fuzzed) customer names and merge them with the main transactional data.
+This workflow ensures that only standardized and validated records are used for dimensional modeling.
 
 ---
 
-## 🔹 Data Flow – Clean Data
+### 🔹 Data Flow – Clean Data
 
-In this Data Flow, an **OLE DB Source** is used to read cleaned and corrected records.
+This step is implemented as a **Data Flow Task** named **Clean Data**.
 
-We join:
+The main purpose of this data flow is to:
 
-* `Final_Dataverse` → main transactional data
-* `Correct_Name` → output of the fuzzy matching step
+* use the **corrected customer names** generated from the fuzzy matching step
+* combine them with the transactional data
+* prepare clean and reliable data for dimension tables
 
-This ensures that only the **correct and standardized customer names** are used while building the dimension tables.
+Two tables are used:
+
+* `Final_Dataverse` – contains the main order and transaction data
+* `Correct_Name` – contains the fuzzed and corrected customer names
+
+Both tables are joined to create a clean and unified dataset.
 
 ---
 
-## 🔹 OLE DB Source Configuration
+### 🔹 OLE DB Source Configuration
+
+The **OLE DB Source** is configured as follows:
 
 **Access Mode**
 
 ```
-SQL command
+SQL Command
 ```
 
-**Query used**
+**SQL Query**
 
 ```sql
 SELECT DISTINCT
@@ -323,24 +329,14 @@ ORDER BY o.OrderDate;
 
 ---
 
-## 🔹 Why SQL Command is Used
+### 🔹 Purpose of Using SQL Command
 
-Using a SQL command inside the OLE DB Source:
+The SQL command is used instead of separate SSIS transformations because:
 
-* performs the **JOIN at the database level**
-* reduces unnecessary data movement inside SSIS
-* improves **performance and execution speed**
-* provides a more **optimized and scalable** data flow
+* the **JOIN operation is executed directly in the database**
+* it reduces the amount of data loaded into the SSIS pipeline
+* it provides a more **optimized and faster execution**
+* it simplifies the data flow design
 
 ---
-
-## 🔹 Output Usage
-
-The cleaned and joined result set is further used to populate:
-
-* **Dim_Customer_Master** – contains standardized customer information
-* **Dim_Product_Master** – contains cleaned and unique product details
-
-This step guarantees that both dimension tables are built only from **validated and corrected data** produced by the fuzzy matching process.
-
 
